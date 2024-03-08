@@ -22,3 +22,11 @@ exports.createUser = (asyncHandler(async (req, res) => {
     const result = await newUser.save()
     res.send(result)
 }))
+
+exports.updateById = (asyncHandler(async (req, res) => {
+    const id = req.params.id
+    const updatedUser = await userModel.findByIdAndUpdate(id, req.body, {
+        new: true
+    })
+    res.send(updatedUser)
+}))

@@ -11,6 +11,8 @@ router.post("/", jsonParser, userController.createUser)
 
 router.get("/:id", userController.getUserById)
 
+router.put("/:id", jsonParser, userController.updateById)
+
 router.delete("/:id", userController.deleteById)
 
 module.exports = router
