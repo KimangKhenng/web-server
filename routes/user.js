@@ -1,18 +1,19 @@
 const express = require("express")
 const router = express.Router()
-const userController = require("../controllers/user.js")
-const bodyParser = require('body-parser')
+const { getAllUsers, createUser, getUserById, updateById, deleteById, getTweetsByUserId } = require("../controllers/user.js")
+const { createUserValidator } = require("../validators/user.js")
+const { validationErrorHandler } = require("../middleware/index.js")
 
-var jsonParser = bodyParser.json()
+router.get("/", getAllUsers)
 
-router.get("/", userController.getAllUsers)
+router.post("/", createUserValidator, validationErrorHandler, createUser)
 
-router.post("/", jsonParser, userController.createUser)
+router.get("/:id", getUserById)
 
-router.get("/:id", userController.getUserById)
+router.get("/:id/tweets", getTweetsByUserId)
 
-router.put("/:id", jsonParser, userController.updateById)
+router.put("/:id", updateById)
 
-router.delete("/:id", userController.deleteById)
+router.delete("/:id", deleteById)
 
 module.exports = router

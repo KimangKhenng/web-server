@@ -1,7 +1,6 @@
 const mongoose = require("mongoose")
 const url = "mongodb://localhost:27017/my-db"
 
-
 async function dbConnect() {
     mongoose.connection.on('connected', () => console.log('connected'));
     mongoose.connection.on('open', () => console.log('open'));
