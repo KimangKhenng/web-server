@@ -1,12 +1,8 @@
 const express = require("express")
 const router = express.Router()
-const { getAllUsers, createUser, getUserById, updateById, deleteById, getTweetsByUserId } = require("../controllers/user.js")
-const { createUserValidator } = require("../validators/user.js")
-const { validationErrorHandler } = require("../middleware/index.js")
+const { getAllUsers, getUserById, updateById, deleteById, getTweetsByUserId } = require("../controllers/user.js")
 
 router.get("/", getAllUsers)
-
-router.post("/", createUserValidator, validationErrorHandler, createUser)
 
 router.get("/:id", getUserById)
 
