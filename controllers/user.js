@@ -9,6 +9,17 @@ const getAllUsers = (async (req, res) => {
     res.send(users)
 })
 
+const googleLogin = (asyncHandler(async (req, res) => {
+
+}))
+
+const handleGoogleLogin = (asyncHandler(async (req, res) => {
+    // Create user if not in our system
+    console.log(req.user)
+    console.log("Hello")
+    res.status(201).json({ hello: "Hello" })
+}))
+
 const getTweetsByUserId = (asyncHandler(async (req, res) => {
     const id = req.params.id
     const users = await userModel.findById(id).populate('tweets').select('tweets')
@@ -43,7 +54,6 @@ const loginUser = (asyncHandler(async (req, res) => {
     const user = await userModel.findOne({
         email: email
     })
-    console.log(user)
     //Compare password
     const passwordMatch = await bcrypt.compare(password, user.password)
     if (!passwordMatch) {
@@ -54,7 +64,11 @@ const loginUser = (asyncHandler(async (req, res) => {
         id: user._id,
         email: user.email,
         username: user.username
-    }, process.env.SECRET)
+    }, process.env.SECRET, {
+        expiresIn: '24h',
+        issuer: 'api.tfdevs.com',
+        audience: 'www.tfdevs.com'
+    })
     return res.status(200).json({ token })
 }))
 
@@ -73,5 +87,7 @@ module.exports = {
     createUser,
     updateById,
     getTweetsByUserId,
-    loginUser
+    loginUser,
+    googleLogin,
+    handleGoogleLogin
 }
