@@ -13,7 +13,6 @@ const googleStrategy = new GoogleStrategy({
             const newUser = new userModel({
                 username: username,
                 email: profile.emails[0].value,
-                password: '2wrfew3t3t'
             })
             await newUser.save()
         }

@@ -18,8 +18,7 @@ const verifyToken = asyncHandler(async (req, res, next) => {
     }
     token = token.replace("Bearer ", "")
     const decoded = jwt.verify(token, process.env.SECRET)
-    req.user = decoded
-    next()
+    return res.json({ user: decoded })
 })
 
 module.exports = { validationErrorHandler, verifyToken }

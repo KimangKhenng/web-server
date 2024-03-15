@@ -9,7 +9,11 @@ const userSchema = new Schema({
     password: String,
     followers: [{ type: mongoose.Types.ObjectId, ref: 'users' }],
     followings: [{ type: mongoose.Types.ObjectId, ref: 'users' }],
-    tweets: [{ type: mongoose.Types.ObjectId, ref: 'tweets' }]
+    tweets: [{ type: mongoose.Types.ObjectId, ref: 'tweets' }],
+    profileType: {
+        type: String,
+        enum: ['sso', 'normal'],
+    }
 })
 
 const userModel = mongoose.model("users", userSchema)

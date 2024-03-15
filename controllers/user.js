@@ -2,7 +2,8 @@ const { userModel } = require("../model/user.js")
 const { tweetModel } = require("../model/tweet.js")
 const asyncHandler = require("express-async-handler")
 const bcrypt = require('bcrypt')
-const jwt = require("jsonwebtoken")
+const axios = require("axios")
+const { checkIfEmailExist, signToken } = require("../common/index.js")
 
 const getAllUsers = (async (req, res) => {
     const users = await userModel.find({}).exec()
@@ -10,14 +11,43 @@ const getAllUsers = (async (req, res) => {
 })
 
 const googleLogin = (asyncHandler(async (req, res) => {
+    const code = req.query.code
+    //Exchange code for token and get user info (Email, name)
+    const { data } = await axios.post('https://oauth2.googleapis.com/token', {
+        client_id: process.env.GOOGLE_CLIENT_ID,
+        client_secret: process.env.GOOGLE_SECRET,
+        code: code,
+        redirect_uri: process.env.GOOGLE_REDIRECT,
+        grant_type: "authorization_code"
+    })
+    const { access_token, id_token } = data
+    const response = await axios.get("https://www.googleapis.com/oauth2/v2/userinfo", {
+        headers: { Authorization: `Bearer ${access_token}` }
+    })
+    const userprofile = response.data
+    // Check if email exist and create new user
+    const ifExist = await checkIfEmailExist(userprofile.email)
+    if (ifExist) {
+        const existingUser = await userModel.findOne({ email: userprofile.email })
+        const token = signToken(existingUser.id, existingUser.email, existingUser.usernames)
+        return res.status(200).json({ token })
+    }
+    // Register 
+    const newUser = new userModel({
+        username: userprofile.email,
+        email: userprofile.email,
+        profileType: "sso"
+    })
+    const result = await newUser.save()
+    const token = signToken(result.id, result.email, result.usernames)
 
+    return res.status(200).json({ token })
 }))
 
 const handleGoogleLogin = (asyncHandler(async (req, res) => {
-    // Create user if not in our system
-    console.log(req.user)
-    console.log("Hello")
-    res.status(201).json({ hello: "Hello" })
+    const url = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${process.env.GOOGLE_CLIENT_ID}&redirect_uri=${process.env.GOOGLE_REDIRECT}&response_type=code&scope=profile email`
+    // Show OAuth2.0 Consent Dialog
+    res.redirect(url)
 }))
 
 const getTweetsByUserId = (asyncHandler(async (req, res) => {
@@ -42,7 +72,8 @@ const createUser = (asyncHandler(async (req, res) => {
     const newUser = new userModel({
         username: username,
         email: email,
-        password: hashedPassword
+        password: hashedPassword,
+        profileType: "normal"
     })
     const result = await newUser.save()
     result.password = ''
@@ -60,15 +91,7 @@ const loginUser = (asyncHandler(async (req, res) => {
         return res.status(401).json({ error: "Password or email incorrect!" })
     }
     //Return JWT to client
-    const token = jwt.sign({
-        id: user._id,
-        email: user.email,
-        username: user.username
-    }, process.env.SECRET, {
-        expiresIn: '24h',
-        issuer: 'api.tfdevs.com',
-        audience: 'www.tfdevs.com'
-    })
+    const token = signToken(user._id, user.email, user.username)
     return res.status(200).json({ token })
 }))
 

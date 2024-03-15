@@ -1,5 +1,6 @@
 const { checkSchema } = require("express-validator")
 const { userModel } = require("../model/user.js")
+const { checkIfEmailExist } = require("../common/index.js")
 
 const createUserValidator = checkSchema({
     username: {
@@ -16,12 +17,8 @@ const createUserValidator = checkSchema({
         errorMessage: "Invalid email address",
         custom: {
             options: async value => {
-                const user = await userModel.find({
-                    email: value
-                })
-                if (user.length != 0) {
-                    throw new Error("Email already registered")
-                }
+                const ifExist = await checkIfEmailExist(value)
+                if (ifExist) throw new Error("Email already registered!")
             }
         }
     },
@@ -58,12 +55,9 @@ const loginUserValidator = checkSchema({
         errorMessage: "Invalid email address",
         custom: {
             options: async value => {
-                const user = await userModel.find({
-                    email: value
-                })
-                if (user.length == 0) {
-                    throw new Error("Email not registered")
-                }
+                const ifExist = await checkIfEmailExist(value)
+                if (!ifExist) throw new Error("Email not registered!")
+                // Check if normal user
             }
         }
     },

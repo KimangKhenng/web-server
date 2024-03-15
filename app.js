@@ -35,7 +35,7 @@ app.use(compression())
 app.use(jsonParser)
 // app.use(express.static("frontend/dist"))
 app.use("/api/users", passport.authenticate('jwt', { session: false }), user)
-app.use("/api/tweets", tweet)
+app.use("/api/tweets", passport.authenticate('jwt', { session: false }), tweet)
 app.use("/api/auth", auth)
 
 app.listen(port, () => {

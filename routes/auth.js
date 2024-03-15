@@ -1,13 +1,14 @@
 const express = require("express")
 const router = express.Router()
 const { createUserValidator, loginUserValidator } = require("../validators/user.js")
-const { validationErrorHandler } = require("../middleware/index.js")
+const { validationErrorHandler, verifyToken } = require("../middleware/index.js")
 const { createUser, loginUser, googleLogin, handleGoogleLogin } = require("../controllers/user.js")
-const passport = require("passport")
+
 
 router.post("/register", createUserValidator, validationErrorHandler, createUser)
 router.post("/login", loginUserValidator, validationErrorHandler, loginUser)
-router.get("/google-login", passport.authenticate('google', { scope: ['profile', 'email'] }), handleGoogleLogin)
-router.get("/google", passport.authenticate('google'), handleGoogleLogin)
+router.get("/google-login", handleGoogleLogin)
+router.get("/google", googleLogin)
+router.get("/me", verifyToken)
 
 module.exports = router
