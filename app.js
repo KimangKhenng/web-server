@@ -17,17 +17,10 @@ require('dotenv').config()
 const dbConnect = require("./db/db.js")
 const passport = require("passport")
 const { jwtStrategy } = require("./auth/jwt-strategy.js")
-const { googleStrategy } = require("./auth/google-strategy.js")
 
 passport.use(jwtStrategy)
-passport.use(googleStrategy)
 dbConnect().catch((err) => { console.log(err) })
 
-app.use(session({
-    secret: 'dfndfndnfn',
-    resave: false,
-    saveUninitialized: true
-}))
 app.use(cors())
 app.use(responseTime())
 app.use(morgan('combined'))
