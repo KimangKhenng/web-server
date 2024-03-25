@@ -32,7 +32,6 @@ const googleLogin = (asyncHandler(async (req, res) => {
         const token = signToken(existingUser.id, existingUser.email, existingUser.usernames)
         return res.status(200).json({ token })
     }
-    // Register 
     const newUser = new userModel({
         username: userprofile.email,
         email: userprofile.email,
