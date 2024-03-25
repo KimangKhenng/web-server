@@ -25,7 +25,6 @@ const googleLogin = (asyncHandler(async (req, res) => {
         headers: { Authorization: `Bearer ${access_token}` }
     })
     const userprofile = response.data
-    // Check if email exist and create new user
     const ifExist = await checkIfEmailExist(userprofile.email)
     if (ifExist) {
         const existingUser = await userModel.findOne({ email: userprofile.email })
