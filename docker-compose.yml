@@ -1,0 +1,13 @@
+version: "3"
+services:
+  tw-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: tw-server
+    volumes:
+      - .:/app/
+      - .env:/app/.env
+      - /app/node_modules
+    ports:
+      - "80:3000"
